@@ -27,8 +27,6 @@ public class Q1Servlet extends HttpServlet {
         result.append(dateTime()).append("\n");
         result.append(decryptedMessage);
 
-        System.out.println(result.toString());
-
         PrintWriter writer = response.getWriter();
         writer.write(result.toString());
         writer.close();
@@ -67,10 +65,10 @@ public class Q1Servlet extends HttpServlet {
         return c;
     }
     
-    public String reverseTriangle(String str, String z) {
+    public String reverseTriangle(String c, String z) {
         BigInteger num = new BigInteger(z);
         int k = num.remainder(new BigInteger("25")).intValue() + 1;
-        int length = str.length();
+        int length = c.length();
         if (Math.sqrt(8*length+1) != (int)Math.sqrt(8*length+1)) {
             return "INVALID";
         }
@@ -88,15 +86,15 @@ public class Q1Servlet extends HttpServlet {
             for (int i = 0; i < n; i++) {
                 if (side == 0) {
                     for (int j = 0; j < n; j++) {
-                        arr[sideLength-round-1][j+round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[sideLength-round-1][j+round] = (char)((c.charAt(index++) - k + 25)%90 + 'A'); 
                     }
                 } else if (side == 1) {
                     for (int j = sideLength - round - 2; j >= sideLength - round - 1 - n; j--) {
-                        arr[j][j-round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[j][j-round] = (char)((c.charAt(index++) - k + 25)%90 + 'A');
                     }
                 } else {
                     for (int j = sideLength - round - 2 - n; j <= sideLength - round - 3; j++) {
-                        arr[j+1][round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[j+1][round] = (char)((c.charAt(index++) - k + 25)%90 + 'A');
                     }
                     round++;
                 }
@@ -115,7 +113,6 @@ public class Q1Servlet extends HttpServlet {
     }
     
     public String decryption(String y, String c) {
-        //String x = "12389084059184098308123098579283204880956800909293831223134798257496372124879237412193918239183928140";
         Q1Servlet test = new Q1Servlet();
         String z = test.key_gen(X, y);
         String m = test.reverseTriangle(c, z);
