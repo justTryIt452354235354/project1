@@ -88,15 +88,15 @@ public class Q1Servlet extends HttpServlet {
             for (int i = 0; i < n; i++) {
                 if (side == 0) {
                     for (int j = 0; j < n; j++) {
-                        arr[sideLength-round-1][j+round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[sideLength-round-1][j+round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
                     }
                 } else if (side == 1) {
                     for (int j = sideLength - round - 2; j >= sideLength - round - 1 - n; j--) {
-                        arr[j][j-round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[j][j-round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
                     }
                 } else {
                     for (int j = sideLength - round - 2 - n; j <= sideLength - round - 3; j++) {
-                        arr[j+1][round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
+                        arr[j+1][round] = (char)((str.charAt(i) - k + 25)%90 + 'A'); 
                     }
                     round++;
                 }
