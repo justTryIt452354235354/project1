@@ -14,19 +14,6 @@ public class Q1Servlet extends HttpServlet {
         private final String TEAM_ID  = "let's go husky";
         private final String X = "12389084059184098308123098579283204880956800909293831223134798257496372124879237412193918239183928140";
 
-//    public static void main(String[] args) {
-//        // TODO Auto-generated method stub
-//        Q1Servlet test = new Q1Servlet();
-//        //System.out.println(test.reverseTriangle("PQRSTUOJFABDGKLMNIEH"));
-//        String Y = "1239793247987948712739187492308012309184023849817397189273981723912221";
-//        String C = "QTGXGTHWEQENWQVKPIRFO";
-//        System.out.println(test.decryption(Y,C));
-//    }
-
-//    public Q1Servlet() {
-//
-//    }
-
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
@@ -80,17 +67,9 @@ public class Q1Servlet extends HttpServlet {
         return c;
     }
     
-    public String caesarify(String z, String m) {
+    public String reverseTriangle(String str, String z) {
         BigInteger num = new BigInteger(z);
         int k = num.remainder(new BigInteger("25")).intValue() + 1;
-        String result = "";
-        for (int i = 0; i < m.length(); i++) {
-            result +=  (char)((m.charAt(i) - k + 25)%90 + 'A'); 
-        }
-        return result;
-    }
-    
-    public String reverseTriangle(String str) {
         int length = str.length();
         if (Math.sqrt(8*length+1) != (int)Math.sqrt(8*length+1)) {
             return "INVALID";
@@ -109,15 +88,15 @@ public class Q1Servlet extends HttpServlet {
             for (int i = 0; i < n; i++) {
                 if (side == 0) {
                     for (int j = 0; j < n; j++) {
-                        arr[sideLength-round-1][j+round] = str.charAt(index++);
+                        arr[sideLength-round-1][j+round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
                     }
                 } else if (side == 1) {
                     for (int j = sideLength - round - 2; j >= sideLength - round - 1 - n; j--) {
-                        arr[j][j-round] = str.charAt(index++);
+                        arr[j][j-round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
                     }
                 } else {
                     for (int j = sideLength - round - 2 - n; j <= sideLength - round - 3; j++) {
-                        arr[j+1][round] = str.charAt(index++);
+                        arr[j+1][round] = (char)((c.charAt(i) - k + 25)%90 + 'A'); 
                     }
                     round++;
                 }
@@ -135,57 +114,11 @@ public class Q1Servlet extends HttpServlet {
         return result;
     }
     
-    
-    public String spiralizeTriangle(String str) {
-        int length = str.length();
-        if (Math.sqrt(8*length+1) == (int)Math.sqrt(8*length+1)) {
-            String result = "";
-            int sideLength = (int) (-0.5 + 0.5*Math.sqrt(1+8*length));
-            char[][] arr = new char[sideLength][];
-            int sum = 0;
-            for (int level = 0; level < sideLength; level++) {
-                char[] temp = new char[level+1];
-                for (int i = 0; i < level+1; i++) {
-                    temp[i] = str.charAt(sum++);
-                }
-                arr[level] = temp;
-            }
-            int side = 0;
-            int round = 0;
-            int n = sideLength;
-            while (n != 0) {
-                for (int i = 0; i < n; i++) {
-                    if (side == 0) {
-                        for (int j = 0; j < n; j++) {
-                            result += arr[sideLength-round-1][j+round];
-                        }
-                    } else if (side == 1) {
-                        for (int j = sideLength - round - 2; j >= sideLength - round - 1 - n; j--) {
-                            result += Character.toString(arr[j][j-round]);
-                        }
-                    } else {
-                        for (int j = sideLength - round - 2 - n; j <= sideLength - round - 3; j++) {
-                            result += Character.toString(arr[j+1][round]);
-                        }
-                        round++;
-                    }
-                    n--;
-                    side++;
-                    side %= 3;
-                }
-            }
-            return result;
-        } else {
-            return "INVALID";
-        }
-    }
-    
     public String decryption(String y, String c) {
         //String x = "12389084059184098308123098579283204880956800909293831223134798257496372124879237412193918239183928140";
         Q1Servlet test = new Q1Servlet();
         String z = test.key_gen(X, y);
-        String i = test.caesarify(z, c);
-        String m = test.reverseTriangle(i);
+        String m = test.reverseTriangle(c, z);
         return m;
     }
     
