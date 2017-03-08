@@ -17,7 +17,7 @@ public class Q1Controller {
     public Q1Controller() throws Exception{
 
     }
-    public static final String PATH = "/Q1Controller";
+    public static final String PATH = "/q1";
 
 
     public static void main(String[] args) throws Exception{
@@ -28,7 +28,7 @@ public class Q1Controller {
                     .setDeploymentName("handler.war")
                     .addServlets(
                             servlet("Q1Servlet", Q1Servlet.class)
-                            .addMapping("/Q1")
+                            .addMapping("/")
                     );
 
 
