@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.*;
 import java.text.SimpleDateFormat;
@@ -25,9 +26,13 @@ public class Q1Servlet extends HttpServlet {
         StringBuilder result = new StringBuilder();
         result.append(TEAM_ID).append(",").append(TEAM_AWS_ACCOUNT_ID).append("\n");
         result.append(dateTime()).append("\n");
-        result.append(decryptedMessage);
+        result.append(decryptedMessage).append("\n");
 
-        PrintWriter writer = response.getWriter();
+        System.out.println("=====Result: \n" + result.toString());
+        //response.setContentType("text/html; charset=UTF-8");
+        PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
+        //writer.println();
         writer.write(result.toString());
         writer.close();
     }
@@ -86,15 +91,15 @@ public class Q1Servlet extends HttpServlet {
             for (int i = 0; i < n; i++) {
                 if (side == 0) {
                     for (int j = 0; j < n; j++) {
-                        arr[sideLength-round-1][j+round] = (char)((c.charAt(index++) - k + 25)%90 + 'A'); 
+                        arr[sideLength-round-1][j+round] = (char)((c.charAt(index++) - 65 - k + 26)%26 + 'A');
                     }
                 } else if (side == 1) {
                     for (int j = sideLength - round - 2; j >= sideLength - round - 1 - n; j--) {
-                        arr[j][j-round] = (char)((c.charAt(index++) - k + 25)%90 + 'A');
+                        arr[j][j-round] = (char)((c.charAt(index++) - 65 - k + 26)%26 + 'A');
                     }
                 } else {
                     for (int j = sideLength - round - 2 - n; j <= sideLength - round - 3; j++) {
-                        arr[j+1][round] = (char)((c.charAt(index++) - k + 25)%90 + 'A');
+                        arr[j+1][round] = (char)((c.charAt(index++) - 65 - k + 26)%26 + 'A');
                     }
                     round++;
                 }
