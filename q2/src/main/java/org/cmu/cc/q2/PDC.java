@@ -36,8 +36,8 @@ public class PDC {
 	}
 	
 	private static void KeyGen() {
-		System.out.println("X: " + X);
-		System.out.println("Y: " + Y);
+		//System.out.println("X: " + X);
+		//System.out.println("Y: " + Y);
 		
 		// generate Z
 		String strX = X.toString();
@@ -62,13 +62,13 @@ public class PDC {
 			tmpSum = "";
 		}
 		Z = new BigInteger(tmpY);
-		System.out.println("Z: " + Z);
+		//System.out.println("Z: " + Z);
 	}
 	
 	private static void generateK() {
 		BigInteger tmpK = Z.remainder(new BigInteger("25")).add(new BigInteger("1"));
 		K = tmpK.intValue();
-		System.out.println("K: " + K);
+		//System.out.println("K: " + K);
 	}
 	
 	private static void reverseRotate(String s) {
@@ -82,14 +82,14 @@ public class PDC {
 				side = side + 1;
 			}
 		}
-		System.out.println("side:" + side);
+		//System.out.println("side:" + side);
 		
 		// fill in a triangle
 		char[][] triangle = new char[side][side];
 		fill(triangle, 0, 0, side, tmp, 0);
 		
 		System.out.println("Triangle:");
-		printTriangle(triangle);
+		//printTriangle(triangle);
 		
 		// reverse rotate a triangle
 		char[][] ch = new char[side][side];
@@ -103,7 +103,7 @@ public class PDC {
 		}
 		
 		System.out.println("Rotate Triangle:");
-		printTriangle(ch);
+		//printTriangle(ch);
 		
 		String result = "";
 		for (int i = 0; i < side; i++) {
@@ -112,7 +112,7 @@ public class PDC {
 			}
 		}
 		I = result;
-		System.out.println("I: " + I);
+		//System.out.println("I: " + I);
 	}
 	
 	private static void fill(char[][] triangle, int xStart, int yStart, int offset, char[] origin, int index) {
