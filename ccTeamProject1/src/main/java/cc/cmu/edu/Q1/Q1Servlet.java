@@ -50,24 +50,22 @@ public class Q1Servlet extends HttpServlet {
     }
 
     
-    public String digit_add(String a1, String a2) {
+    public String key_gen(String x, String y) {
         String result = "";
-        for (int i = 0; i < a1.length(); i++) {
-            int a = Character.getNumericValue(a1.charAt(i));
-            int b = Character.getNumericValue(a2.charAt(i));
-            result += Integer.toString((a+b) % 10);
+        int length = x.length() - y.length() + 1;
+        int total = 0;
+        for (int i = 0; i < length; i++) {
+            total += x.charAt(i) - '0';
+        }
+        for (int i = 0; i < y.length(); i++) {
+            if (i == 0) {
+                result += (char) (y.charAt(i) + total - '0') % 10;
+            } else {
+                total = total - (x.charAt(i-1) -'0') + (x.charAt(i + length - 1) - '0');
+                result += (char) (y.charAt(i) + total - '0') % 10;  
+            }
         }
         return result;
-    }
-    
-    public String key_gen(String z, String c) {
-        int n1 = z.length();
-        int n2 = c.length();
-        Q1Servlet test = new Q1Servlet();
-        for (int i = 0; i < n1 - n2 + 1; i++) {
-            c = test.digit_add(c,z.substring(i, i+n2));
-        }
-        return c;
     }
     
     public String reverseTriangle(String c, String z) {
@@ -123,9 +121,4 @@ public class Q1Servlet extends HttpServlet {
         String m = test.reverseTriangle(c, z);
         return m;
     }
-    
-    
-    
-    
-    
 }
