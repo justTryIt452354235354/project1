@@ -1,4 +1,4 @@
-package org.cmu.cc.q2;
+package org.cmu.cc.q1;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
