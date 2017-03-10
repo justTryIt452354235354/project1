@@ -13,7 +13,7 @@ import java.net.URI;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:80/";
+    public static final String BASE_URI = "http://0.0.0.0:80/";
 	//public static final String BASE_URI = "http://ec2-54-236-63-226.compute-1.amazonaws.com:80/";
 
     /**

@@ -40,7 +40,7 @@ public class Q1Controller {
                     .addPrefixPath(PATH, servletHandler);
 
             Undertow server = Undertow.builder()
-                    .addHttpListener(80, "localhost")
+                    .addHttpListener(80, "0.0.0.0")
                     .setHandler(path)
                     .build();
             server.start();

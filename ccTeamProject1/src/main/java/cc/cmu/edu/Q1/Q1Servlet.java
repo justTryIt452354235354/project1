@@ -28,7 +28,7 @@ public class Q1Servlet extends HttpServlet {
         result.append(dateTime()).append("\n");
         result.append(decryptedMessage).append("\n");
 
-        System.out.println("=====Result: \n" + result.toString());
+        //System.out.println("=====Result: \n" + result.toString());
         //response.setContentType("text/html; charset=UTF-8");
         PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
