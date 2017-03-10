@@ -7,15 +7,19 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 
-@Path("/q1")
+@Path("/q2")
 public class Q1 {
+	
+	private static String TEAM_ID = "let's go husky";
+	private static String TEAM_AWS_ACCOUNT_ID = "368196891489";
+	
 	@GET
     @Produces(MediaType.TEXT_PLAIN)
     public String print(@QueryParam("key") String key, @QueryParam("message") String message) {
-//		String key = request.getParameter("key");
-//		String message = request.getParameter("message");
 		String key1 = key;
 		String message1 = message;
+		System.out.println("key: " + key1);
+		System.out.println("message: " + message1);
 		
 		String plainText = "";
 		if (key1 == null || message1 == null) {
@@ -33,9 +37,7 @@ public class Q1 {
 		}
 		return getResponse(plainText);
     }
-	
-	private static String TEAM_ID = System.getenv("teamID");
-	private static String TEAM_AWS_ACCOUNT_ID = System.getenv("awsID");
+
 	public String getResponse(String plainText) {
 		StringBuilder sb = new StringBuilder();
 		String time = "";
@@ -43,7 +45,7 @@ public class Q1 {
         time = simpleFormat.format(new Date());
 		sb.append(TEAM_ID).append(",").append(TEAM_AWS_ACCOUNT_ID)
 			.append("\n").append(time)
-			.append("\n").append(plainText);
+			.append("\n").append(plainText).append("\n");
 		return sb.toString();
 	}
 }

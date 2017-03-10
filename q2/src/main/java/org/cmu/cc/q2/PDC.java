@@ -88,7 +88,7 @@ public class PDC {
 		char[][] triangle = new char[side][side];
 		fill(triangle, 0, 0, side, tmp, 0);
 		
-		System.out.println("Triangle:");
+		//System.out.println("Triangle:");
 		//printTriangle(triangle);
 		
 		// reverse rotate a triangle
@@ -102,7 +102,7 @@ public class PDC {
 			}
 		}
 		
-		System.out.println("Rotate Triangle:");
+		//System.out.println("Rotate Triangle:");
 		//printTriangle(ch);
 		
 		String result = "";
