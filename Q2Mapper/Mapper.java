@@ -18,35 +18,37 @@ class Mapper {
         Object id = obj.get("id");
         Object idStr = obj.get("id_str");
         if ((id == null || id.toString().isEmpty()) || (idStr == null || idStr.toString().isEmpty())) {
-            System.out.println("==================tid is missing");
+            //System.out.println("==================tid is missing");
             return true;
         }
         JSONObject user = (JSONObject) obj.get("user");
         Object id2 = user.get("id");
         Object idStr2 = user.get("id_str");
         if ((id2 == null || id2.toString().isEmpty()) || (idStr2 == null || idStr2.toString().isEmpty())) {
-            System.out.println("==================uid is missing" + obj.toJSONString());
+            //System.out.println("==================uid is missing" + obj.toJSONString());
             return true;
         }
         Object created_at = obj.get("created_at");
         if (created_at == null || created_at.toString().isEmpty()) {
-            System.out.println("==================created at is missing");
+            //System.out.println("==================created at is missing");
             return true;
         }
         Object text = obj.get("text");
         if (text == null || text.toString().isEmpty()) {
-            System.out.println("==================text is missing");
+            //System.out.println("==================text is missing");
             return true;
         }
         Object lang = obj.get("lang");
         if (lang == null || lang.toString().isEmpty()) {
-            System.out.println("==================lang is missing");
+            //System.out.println("==================lang is missing");
             return true;
         }
         JSONObject entities = (JSONObject) obj.get("entities");
         if (entities != null) {
             JSONArray hashtags = (JSONArray) entities.get("hashtags");
-            if (hashtags != null) {
+            if (hashtags.size() == 0) {
+                return true;
+            } else {
                 for (int j = 0; j < hashtags.size(); j++) {
                     JSONObject o = (JSONObject) hashtags.get(j);
                     if (o.get("text") == null || o.get("text").toString().isEmpty())
@@ -61,13 +63,13 @@ class Mapper {
     public static boolean isDuplicate(JSONObject obj) {
         Object id = obj.get("id");
         Object id_str = obj.get("id_str");
-        if (id != null) {
+        if (id != null && !id.toString().isEmpty()) {
             if (idSet.contains(id))
                 return true;
             else
                 idSet.add(id);
         }
-        if (id_str != null) {
+        if (id_str != null && !id_str.toString().isEmpty()) {
             if (idStrSet.contains(id_str))
                 return true;
             else
@@ -84,10 +86,7 @@ class Mapper {
         final String regex = "^(ar|en|fr|in|pt|es|tr)$";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(langValue);
-        if (!matcher.find())
-            return true;
-        else
-            return false;
+        return (!matcher.find());
     }
 
     public static String isShortenedURLs(String line) {
