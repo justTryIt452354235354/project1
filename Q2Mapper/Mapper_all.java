@@ -1,16 +1,10 @@
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-
 import org.json.simple.JSONArray;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.*;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,13 +23,6 @@ public class Mapper_all {
 
         JSONArray hashtags = (JSONArray) entities.get("hashtags");
         if (hashtags == null || hashtags.size() == 0) return true;
-
-//        for (int j = 0; j < hashtags.size(); j++) {
-//            JSONObject o = (JSONObject) hashtags.get(j);
-//            if (o.get("text") != null && !o.get("text").toString().isEmpty())
-//                break;//只要有一个有text，就满足条件, 所以跳出循环，进入下一项
-//            if (j == hashtags.size() - 1 && j != 0) return true; //如果已经都到最后了，还是没有发现有text，那么直接return malform
-//        }
 
         for (int j = 0; j < hashtags.size(); j++) {
             JSONObject o = (JSONObject) hashtags.get(j);
@@ -57,17 +44,13 @@ public class Mapper_all {
             return true;
         }
         Object created_at = obj.get("created_at");
-        if (created_at == null || created_at.toString().isEmpty()) {
-            return true;
-        }
+        if (created_at == null || created_at.toString().isEmpty()) return true;
+
         Object text = obj.get("text");
-        if (text == null || text.toString().isEmpty()) {
-            return true;
-        }
+        if (text == null || text.toString().isEmpty()) return true;
+
         Object lang = obj.get("lang");
-        if (lang == null || lang.toString().isEmpty()) {
-            return true;
-        }
+        if (lang == null || lang.toString().isEmpty()) return true;
         
         return false;
     }
@@ -76,6 +59,7 @@ public class Mapper_all {
     public static boolean isDuplicate(JSONObject obj) {
         Object id = obj.get("id");
         Object id_str = obj.get("id_str");
+
         if (id != null && !id.toString().isEmpty()) {
             if (idSet.contains(id))
                 return true;
@@ -94,7 +78,8 @@ public class Mapper_all {
     // third step
     public static boolean isInValidLanguage(JSONObject obj) {
         Object lang = obj.get("lang");
-        if (lang == null) return true; //前面已经filter过了
+
+        //if (lang == null || lang.toString().isEmpty()) return true; //前面已经filter过了
         String langValue = lang.toString();
         final String regex = "^(ar|en|fr|in|pt|es|tr)$";
         final Pattern pattern = Pattern.compile(regex);
@@ -106,69 +91,32 @@ public class Mapper_all {
     public static String isShortenedURLs(String line) {
 
         final String regex = "(https?|ftp):\\/\\/[\\.[a-zA-Z0-9]\\/\\-_]+";
-//        final String regex2 = "([\"'])(?:(?=(\\\\?))\\2.)*?\\1";
-        final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        final Matcher matcher = pattern.matcher(line);
-
-        while (matcher.find()) {
-//            System.out.println("Full match: " + matcher.group(0));
-//            for (int i = 1; i <= matcher.groupCount(); i++) {
-//                System.out.println("Group " + i + ": " + matcher.group(i));
-//            }
-            line = line.replaceAll(regex,"");
-            //System.out.println(line);
-        }
+        line = line.replaceAll(regex,""); //直接replaceall，不需要再match几次
 
         return line;
 
     }
 
-//    public static boolean isShortenedURLs(String line) {
-//        final String regex = "(https?|ftp)://[^\\t\\r\\n /$.?#][^\\t\\r\\n ]*";
-//        final Pattern pattern = Pattern.compile(regex);
-//        final Matcher matcher = pattern.matcher(line);
-//        if (matcher.find())
-//            return true;
-//        else
-//            return false;
-//    }
-    
-
-
     private static void map() {
         BufferedReader br;
-        PrintWriter out = null;
 
         try {
-            //br = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             br = new BufferedReader(new InputStreamReader(new FileInputStream(FILENAME), StandardCharsets.UTF_8));
-            //br = new BufferedReader(new FileReader(FILENAME)); //the input is json format
 
-            //out = new PrintWriter(
-            //        new OutputStreamWriter(System.out, "UTF-8"), true);
-            
             PrintWriter printWriter = new PrintWriter(new File("mapper"),"UTF-8");
 
             String line;
             while((line = br.readLine()) != null) {
                 try {
                     JSONParser parser = new JSONParser();
-                    JSONObject data = (JSONObject) parser.parse(line);//http://stackoverflow.com/questions/13939925/remove-all-occurrences-of-from-string
-                    line = isShortenedURLs(data.toJSONString().replaceAll("\\\\/", "/"));
+                    line = isShortenedURLs(line.replaceAll("\\\\/", "/"));
+                    JSONObject obj = (JSONObject) parser.parse(line);//http://stackoverflow.com/questions/13939925/remove-all-occurrences-of-from-string
 
-                    JSONObject obj = (JSONObject) parser.parse(line);
-
-                    if (isMalformed(obj)) {
-                        continue;
-                    }
+                    if (isMalformed(obj)) continue;
                     
-                    if (isInValidLanguage(obj)) {
-                        continue;
-                    }
+                    if (isInValidLanguage(obj)) continue;
                     
-                    if (isDuplicate(obj)) {
-                        continue;
-                    }
+                    if (isDuplicate(obj)) continue;
 
                     JSONObject user = (JSONObject) obj.get("user");
                     Object id = user.get("id");
@@ -180,25 +128,22 @@ public class Mapper_all {
                     //    System.out.print("(" + entry.getKey() + ",");
                     //    System.out.print(entry.getValue() + ")");
                     //}
+
                     JSONObject entities = (JSONObject) obj.get("entities");
                     JSONArray hashtags = (JSONArray) entities.get("hashtags");
-                    JSONArray tagArray = new JSONArray();
 
-                    JSONObject lineResult = new JSONObject();
                     for (Object hashtag : hashtags) {
                         JSONObject tag = (JSONObject) hashtag;
-                        //if (tag.get("text") == null || tag.get("text").toString().isEmpty()) System.out.println("!!!");
-                        //System.out.println(tag.get("text") );
-                        tagArray.add(tag.get("text"));
+                        JSONObject lineResult = new JSONObject();
+                        lineResult.put("hashtag_text", tag.get("text"));
+                        lineResult.put("text", obj.get("text"));
+                        if (id == null || id.toString().isEmpty()) {
+                            lineResult.put("userid", idStr);
+                        } else {
+                            lineResult.put("userid", id);
+                        }
+                        printWriter.write(lineResult.toString() + "\n");
                     }
-                    lineResult.put("hashtag_text", tagArray);
-                    if (id == null || id.toString().isEmpty()) {
-                        lineResult.put("userid", idStr);
-                    } else {
-                        lineResult.put("userid", id);
-                    }
-                    lineResult.put("text", obj.get("text"));
-                    printWriter.write(lineResult.toString() + "\n");
 
                     
                     //System.out.println(lineResult.toString());
@@ -219,22 +164,22 @@ public class Mapper_all {
             }
 
         } catch (IOException e) {
-            
-            //out.close();
             e.printStackTrace();
         }
     }
 
 
     public static void main(String[] args) {
+        Stopwatch timer1 = new Stopwatch();
         map();
+        System.out.println(timer1.elapsedTime()/1000 + "sec");
     }
     
     public static HashSet<String> readStopWords() {
         String FILENAME = "stopwords.txt";
         HashSet<String> stopwords = new HashSet<String>();
         
-        String line = null;
+        String line;
         try {
             FileReader fileReader = new FileReader(FILENAME);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
