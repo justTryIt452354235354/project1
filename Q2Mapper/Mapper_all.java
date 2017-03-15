@@ -16,7 +16,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
-public class Mapper {
+public class Mapper_all {
     private final static String FILENAME = "part-r-00000";
     private static HashSet<Object> idSet = new HashSet<>();
     private static HashSet<Object> idStrSet = new HashSet<>();
@@ -44,12 +44,7 @@ public class Mapper {
 
         Object id = obj.get("id");
         Object idStr = obj.get("id_str");
-<<<<<<< HEAD
         if ((id == null || id.toString().isEmpty()) && (idStr == null || idStr.toString().isEmpty())) {//只有都不在的情况才返回,左右两边各2选1
-=======
-        if ((id == null || id.toString().isEmpty()) || (idStr == null || idStr.toString().isEmpty())) {
-            //System.out.println("==================tid is missing");
->>>>>>> 03b2fe9ef61434cd94d711ef5dc65455c4eee11a
             return true;
         }
 
@@ -58,54 +53,22 @@ public class Mapper {
 
         Object id2 = user.get("id");
         Object idStr2 = user.get("id_str");
-<<<<<<< HEAD
         if ((id2 == null || id2.toString().isEmpty()) && (idStr2 == null || idStr2.toString().isEmpty())) {//只有都不在的情况才返回,左右两边各2选1
-=======
-        if ((id2 == null || id2.toString().isEmpty()) || (idStr2 == null || idStr2.toString().isEmpty())) {
-            //System.out.println("==================uid is missing" + obj.toJSONString());
->>>>>>> 03b2fe9ef61434cd94d711ef5dc65455c4eee11a
             return true;
         }
         Object created_at = obj.get("created_at");
         if (created_at == null || created_at.toString().isEmpty()) {
-<<<<<<< HEAD
-=======
-            //System.out.println("==================created at is missing");
->>>>>>> 03b2fe9ef61434cd94d711ef5dc65455c4eee11a
             return true;
         }
         Object text = obj.get("text");
         if (text == null || text.toString().isEmpty()) {
-<<<<<<< HEAD
-=======
-            //System.out.println("==================text is missing");
->>>>>>> 03b2fe9ef61434cd94d711ef5dc65455c4eee11a
             return true;
         }
         Object lang = obj.get("lang");
         if (lang == null || lang.toString().isEmpty()) {
-<<<<<<< HEAD
             return true;
         }
         
-=======
-            //System.out.println("==================lang is missing");
-            return true;
-        }
-        JSONObject entities = (JSONObject) obj.get("entities");
-        if (entities != null) {
-            JSONArray hashtags = (JSONArray) entities.get("hashtags");
-            if (hashtags.size() == 0) {
-                return true;
-            } else {
-                for (int j = 0; j < hashtags.size(); j++) {
-                    JSONObject o = (JSONObject) hashtags.get(j);
-                    if (o.get("text") == null || o.get("text").toString().isEmpty())
-                        return true;
-                }
-            }
-        }
->>>>>>> 03b2fe9ef61434cd94d711ef5dc65455c4eee11a
         return false;
     }
 
