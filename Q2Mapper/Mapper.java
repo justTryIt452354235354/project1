@@ -27,17 +27,16 @@ public class Mapper {
         JSONArray hashtags = (JSONArray) entities.get("hashtags");
         if (hashtags == null || hashtags.size() == 0) return true;
         
-        /*
+
         for (int j = 0; j < hashtags.size(); j++) {
             JSONObject o = (JSONObject) hashtags.get(j);
             if (o.get("text") == null || o.get("text").toString().isEmpty()) return true;
         }
-        */
+
         // Both id and id_str of the tweet object are missing or empty
         Object id = obj.get("id");
         Object idStr = obj.get("id_str");
         if ((id == null || id.toString().isEmpty()) && (idStr == null || idStr.toString().isEmpty())) {
-            //System.out.println("==================tid is missing");
             return true;
         }
         if (id != null && !id.toString().isEmpty()) {
@@ -57,14 +56,12 @@ public class Mapper {
         // text field is missing or empty
         Object text = obj.get("text");
         if (text == null || text.toString().isEmpty()) {
-            //System.out.println("==================text is missing");
             return true;
         }
         
         // created_at field is missing or empty
         Object created_at = obj.get("created_at");
         if (created_at == null || created_at.toString().isEmpty()) {
-            //System.out.println("==================created at is missing");
             return true;
         }
         
@@ -77,7 +74,6 @@ public class Mapper {
         Object id2 = user.get("id");
         Object idStr2 = user.get("id_str");
         if ((id2 == null || id2.toString().isEmpty()) && (idStr2 == null || idStr2.toString().isEmpty())) {
-            //System.out.println("==================uid is missing" + obj.toJSONString());
             return true;
         }
         
@@ -86,7 +82,6 @@ public class Mapper {
         // lang field is missing or empty or malformed
         Object lang = obj.get("lang");
         if (lang == null || lang.toString().isEmpty()) {
-            //System.out.println("==================lang is missing");
             return true;
         }
         String langValue = lang.toString();
@@ -96,9 +91,7 @@ public class Mapper {
         if (!matcher.find()) {
             return true;
         }
-        
-        
-        
+
         return false;
     }
 
@@ -131,12 +124,12 @@ public class Mapper {
                     line = isShortenedURLs(line.replaceAll("\\\\/", "/"));
                     JSONObject obj = (JSONObject) parser.parse(line);//http://stackoverflow.com/questions/13939925/remove-all-occurrences-of-from-string
 
+
                     if (isMalformed(obj)) {
-                        //System.out.println("===========malformed json==========");
                         continue;
                     }
-                    
-                    String text = obj.get("text").toString();
+
+                    String text = obj.get("text").toString();//先转成string然后parse成json，然后转成string
                     HashMap<String, Integer> wordFreq = effectiveWord(text, stopwords);
                     lineResult.put("text", wordFreq);
 
@@ -188,7 +181,7 @@ public class Mapper {
         String FILENAME = "stopwords.txt";
         HashSet<String> stopwords = new HashSet<String>();
         
-        String line = null;
+        String line;
         try {
             FileReader fileReader = new FileReader(FILENAME);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
