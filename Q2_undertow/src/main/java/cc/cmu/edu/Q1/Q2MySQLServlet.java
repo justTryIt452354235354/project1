@@ -124,17 +124,15 @@ public class Q2MySQLServlet extends HttpServlet {
     }
     
     private static int getSum(JSONObject jObject) {
-    	int sum = 0;
-    	Iterator<?> keys = (Iterator<?>) jObject.keySet();
-  
-    	while (keys.hasNext()) {
-    		String key = (String) keys.next();
-    		if (keywordSet.contains(key)) {
-    			Integer value = (Integer) jObject.get(key);
-    			sum += value;  			
-    		}
-    	}
-    	return sum;
+		int sum = 0;
+
+		for (Object key : jObject.keySet()) {
+			if (keywordSet.contains(String.valueOf(key).toLowerCase())) {
+				int value = Integer.parseInt(jObject.get(key).toString());
+				sum += value;
+			}
+		}
+		return sum;
     }
     
     // TODO
@@ -164,7 +162,7 @@ public class Q2MySQLServlet extends HttpServlet {
     private static HashSet<String> getKeyWordList(String list) {
     	HashSet<String> result = new HashSet<>();
     	for (String str : list.split(",")) {
-    		result.add(str);
+    		result.add(str.toLowerCase());
     	}
     	return result;
     }
