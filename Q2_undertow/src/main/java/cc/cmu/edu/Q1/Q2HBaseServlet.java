@@ -38,7 +38,8 @@ import java.util.Set;
 public class Q2HBaseServlet extends HttpServlet {
     private final String TEAM_AWS_ACCOUNT_ID = "368196891489";
     private final String TEAM_ID  = "let's go husky";
-
+    private static HashSet<String> keywordSet = null;
+    
 	private static String zkAddr = "172.31.3.88"; //TODO
 	private static TableName tableName = TableName.valueOf("q2db");
 	private Table relationsTable;
@@ -68,45 +69,46 @@ public class Q2HBaseServlet extends HttpServlet {
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
 		try {
-			String result = "";
 			String hashtag = request.getParameter("hashtag");
 	    	String N = request.getParameter("N");
 	    	String list_of_key_words = request.getParameter("list_of_key_words");
-
-	    	result = queryFromHBase(hashtag, N, list_of_key_words);
-
 	    	PrintWriter writer = new PrintWriter(
 	                new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
+	    	
+	    	StringBuilder result = new StringBuilder();
+	    	result.append(TEAM_ID).append(",").append(TEAM_AWS_ACCOUNT_ID).append("\n");
+	    	
+	    	// malformed
+            if (hashtag == null || N == null || list_of_key_words == null) {
+                writer.write(result.toString());
+                writer.close();
+            }
+	        
+	        result.append(queryFromHBase(hashtag, N, list_of_key_words)).append("\n");
+	    	
 	    	writer.write(result.toString());
 	        writer.close();
+	    	
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	//TODO
 	private String queryFromHBase(String hashtag, String N, String list_of_key_words) {
-		HashSet<String> key_words_list = key_word_set(list_of_key_words);
-
-		byte[] bColhashtag = Bytes.toBytes("hashtag");
+		byte[] textAndUserid = Bytes.toBytes("textAndUserid");
         Get get = new Get(Bytes.toBytes(hashtag));
-        get.addColumn(bColFamily, bColhashtag);
+        get.addColumn(bColFamily, textAndUserid);
         Result r = linkTable.get(get);
-        PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
-
-        if (r.isEmpty()) {
-            PrintWriter writer = response.getWriter();
-            writer.write(String.format("returnRes(%s)", );
-            writer.close();
-            StringBuilder result = new StringBuilder();
-            result.append(TEAM_ID).append(",").append(TEAM_AWS_ACCOUNT_ID).append("\n");
-            result.append(dateTime()).append("\n");
-            result.append(decryptedMessage).append("\n");
-            return;
+        
+        String input =  new String(r.list()[0].getValue());
+        
+        keywordSet = getKeyWordList(list_of_key_words);
+        try {
+            String output = parse(column, Integer.parseInt(N));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-
-		return null;
+		return output;
 	}
 
 	@Override

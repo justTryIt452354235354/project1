@@ -23,8 +23,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
-
 /**
  * 
  * @author zack
@@ -37,8 +35,7 @@ public class Q2MySQLServlet extends HttpServlet {
     private static final String DB_USER = System.getenv("db_user"); //TODO
     private static final String DB_PWD = System.getenv("db_pwd"); //TODO
     private static final String TEAM_ID = "";
-    private static final String TEAM_AWS_ACCOUNT_ID = "";
-    
+    private static final String TEAM_AWS_ACCOUNT_ID = "";    
     
     private static Connection connection;
     
