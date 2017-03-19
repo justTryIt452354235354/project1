@@ -3,12 +3,16 @@ import java.nio.charset.StandardCharsets;
 import org.json.simple.JSONArray;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.json.*;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class Mapper {
     //private final static String FILENAME = "part-r-00000";
@@ -37,8 +41,6 @@ public class Mapper {
         if ((id == null || id.toString().isEmpty()) && (idStr == null || idStr.toString().isEmpty())) {
             return true;
         }
-
-        //duplicate
         if (id != null && !id.toString().isEmpty()) {
             if (idSet.contains(id))
                 return true;
@@ -51,7 +53,7 @@ public class Mapper {
             else
                 idStrSet.add(idStr);
         }
-
+        
         
         // text field is missing or empty
         Object text = obj.get("text");
@@ -95,6 +97,7 @@ public class Mapper {
         return false;
     }
 
+
     public static String isShortenedURLs(String line) {
         final String regex = "(https?|ftp):\\/\\/[\\.[a-zA-Z0-9]\\/\\-_]+";
         line = line.replaceAll(regex,"");
@@ -128,16 +131,13 @@ public class Mapper {
 
                     String text = obj.get("text").toString();//先转成string然后parse成json，然后转成string
 
+
                     HashMap<String, Integer> wordFreq = effectiveWord(text, stopwords);
                     lineResult.put("text", wordFreq);
 
                     JSONObject user = (JSONObject) obj.get("user");
                     Object id = user.get("id");
                     Object idStr = user.get("id_str");
-
-                    Object tid = obj.get("id");
-                    Object tidStr = obj.get("id_str");
-
                     if (id == null || id.toString().isEmpty()) {
                         String userid = idStr.toString();
                         lineResult.put("userid", userid);
@@ -145,13 +145,6 @@ public class Mapper {
                         String userid = id.toString();
                         lineResult.put("userid", userid);
                     }
-
-                    if (tid == null || tid.toString().isEmpty()) {
-                        lineResult.put("tid", tidStr.toString());
-                    } else {
-                        lineResult.put("tid", tid.toString());
-                    }
-
 
                     JSONObject entities = (JSONObject) obj.get("entities");
                     JSONArray hashtags = (JSONArray) entities.get("hashtags");
@@ -163,7 +156,8 @@ public class Mapper {
                         
                         String hashTag_text = tag.get("text").toString();
                         lineResult.put("hashTag_text", hashTag_text);
-                        printWriter.print(lineResult.toString() + "\n");
+                        //printWriter.append(hashTag_text + "\t");
+                        printWriter.append(lineResult.toString() + "\n");
                     }
                 } catch (ParseException e) {
                     continue; // cannot be parsed as a JSON object
@@ -187,7 +181,7 @@ public class Mapper {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             while ((line = bufferedReader.readLine()) != null) {
-                stopwords.add(line.toLowerCase());
+                stopwords.add(line);
             }
             bufferedReader.close();
         } catch (IOException e) {
@@ -205,7 +199,7 @@ public class Mapper {
         for (String s : arr) {
             if (!stopwords.contains(s.toLowerCase())) {
                 if (s.matches("\\p{L}+")) {
-                    frequencyMap.put(s.toLowerCase(), frequencyMap.getOrDefault(s.toLowerCase(),0) + 1);
+                    frequencyMap.put(s, frequencyMap.getOrDefault(s,0) + 1);
                 }
             }
         }
