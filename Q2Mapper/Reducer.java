@@ -51,7 +51,6 @@ public class Reducer {
                             idSet.add(tid.toString());
                     }
 
-                    lineResult.remove("hashTag_text");
                     lineResult.remove("tid");
 
                     if (!tag.equals(currentTag)) {
