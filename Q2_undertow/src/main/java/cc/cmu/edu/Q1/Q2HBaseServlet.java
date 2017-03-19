@@ -70,6 +70,17 @@ public class Q2HBaseServlet extends HttpServlet {
 	
 	//TODO
 	private String queryFromHBase(String hashtag, String N, String list_of_key_words) {
+		HashSet<String> key_words_list = key_word_set(list_of_key_words); 		
+		Scan scan = new Scan();
+		RegexStringComparator comp1 = new RegexStringComparator("^"+ id + "\\$");
+        	Filter filter1 = new RowFilter(CompareFilter.CompareOp.EQUAL, comp1);
+        
+        	byte[] followerCol = Bytes.toBytes("follower");
+        	scan.addColumn(bColFamily, followerCol);
+        
+        	List<JSONObject> list = new ArrayList<JSONObject>();
+        	scan.setFilter(filter1);
+        	ResultScanner rs = bizTable.getScanner(scan);
 		return null;
 	}
 	
@@ -77,7 +88,15 @@ public class Q2HBaseServlet extends HttpServlet {
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
-    }
+    	}
+	
+	public static HashSet<String> key_word_set(String list) {
+		HashSet<String> result = new HashSet<String>();
+		for (String str : list.split(",")) {
+		    result.add(str);
+		}
+		return result;
+    	}
 	
 }
 
