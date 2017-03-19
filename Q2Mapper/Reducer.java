@@ -44,22 +44,13 @@ public class Reducer {
 
 
                     //duplicate
-                    if (tid != null && !tid.toString().isEmpty()) {
+                    if (tag.equals(currentTag) && !tid.toString().isEmpty()) {
                         if (idSet.contains(tid.toString()))
-                            continue; //如果重复了就不要了
+                            continue;
                         else
                             idSet.add(tid.toString());
                     }
 
-//                    if (result.get(hashTag_text) == null) {
-//                        array = new JSONArray();
-//                        array.add(lineResult);
-//                        result.put(hashTag_text, array);
-//                    } else {
-//                        array = result.get(hashTag_text);
-//                        array.add(lineResult);
-//                        result.put(hashTag_text, array);
-//                    }
                     lineResult.remove("hashTag_text");
                     lineResult.remove("tid");
 

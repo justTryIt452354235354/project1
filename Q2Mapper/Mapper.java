@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Mapper {
-    //private final static String FILENAME = "part-r-00000";
+
     private static HashSet<Object> idSet = new HashSet<>();
     private static HashSet<Object> idStrSet = new HashSet<>();
     
-    // first step
+
     public static boolean isMalformed(JSONObject obj) {
         
         // hashtag text (stated above) is missing or empty
@@ -24,12 +24,6 @@ public class Mapper {
         
         JSONArray hashtags = (JSONArray) entities.get("hashtags");
         if (hashtags == null || hashtags.size() == 0) return true;
-        
-
-//        for (int j = 0; j < hashtags.size(); j++) {
-//            JSONObject o = (JSONObject) hashtags.get(j);
-//            if (o.get("text") == null || o.get("text").toString().isEmpty()) return true;
-//        }
 
         // Both id and id_str of the tweet object are missing or empty
         Object id = obj.get("id");
@@ -105,12 +99,11 @@ public class Mapper {
     private static void map() {
         HashSet<String> stopwords = readStopWords();
         BufferedReader br;
-        //HashMap<String, LinkedList<String>> result = new HashMap<String, LinkedList<String>>();
+
 
         try {
             //br = new BufferedReader(new InputStreamReader(new FileInputStream(FILENAME), StandardCharsets.UTF_8));
             br = new BufferedReader(new InputStreamReader(System.in,StandardCharsets.UTF_8));
-            //PrintWriter printWriter = new PrintWriter(new File("reducer_Result_final"),"UTF-8");
             PrintStream printWriter = new PrintStream(System.out, true, "UTF-8");
             String line;
             while((line = br.readLine()) != null) {
@@ -119,14 +112,14 @@ public class Mapper {
 
                     JSONParser parser = new JSONParser();
                     line = isShortenedURLs(line.replaceAll("\\\\/", "/"));
-                    JSONObject obj = (JSONObject) parser.parse(line);//http://stackoverflow.com/questions/13939925/remove-all-occurrences-of-from-string
+                    JSONObject obj = (JSONObject) parser.parse(line);
 
 
                     if (isMalformed(obj)) {
                         continue;
                     }
 
-                    String text = obj.get("text").toString();//先转成string然后parse成json，然后转成string
+                    String text = obj.get("text").toString();
 
                     HashMap<String, Integer> wordFreq = effectiveWord(text, stopwords);
                     lineResult.put("text", wordFreq);
@@ -150,7 +143,7 @@ public class Mapper {
                         lineResult.put("tid", tidStr.toString());
                     } else {
                         lineResult.put("tid", tid.toString());
-                    }
+                    } // add uid to filter the duplicate tweet in reducer
 
 
                     JSONObject entities = (JSONObject) obj.get("entities");
@@ -206,7 +199,7 @@ public class Mapper {
             if (!stopwords.contains(s.toLowerCase())) {
                 if (s.matches("\\p{L}+")) {
                     frequencyMap.put(s.toLowerCase(), frequencyMap.getOrDefault(s.toLowerCase(),0) + 1);
-                }
+                } //case insensitive in the hashmap
             }
         }
         return frequencyMap;
@@ -215,9 +208,7 @@ public class Mapper {
 
 
     public static void main(String[] args) {
-        //StopWatch timer1 = new StopWatch();
         map();
-        //System.out.println(timer1.elapsedTime()/1000 + "sec");
     }
     
 }
