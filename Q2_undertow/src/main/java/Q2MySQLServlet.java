@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.sql.*;
 
 import javax.servlet.ServletException;
+import javax.servlet.SingleThreadModel;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +31,7 @@ import org.json.simple.parser.ParseException;
  * @author zack
  * Query 2 for MySQL
  */
-public class Q2MySQLServlet extends HttpServlet {
+public class Q2MySQLServlet extends HttpServlet{
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_NAME = "q2";
     private static final String URL = "jdbc:mysql://localhost:3306/" + DB_NAME + "?useSSL=false";
@@ -38,7 +39,7 @@ public class Q2MySQLServlet extends HttpServlet {
     private static final String DB_PWD = "husky2017"; 
     private static final String TEAM_ID = "let's go husky";
     private static final String TEAM_AWS_ACCOUNT_ID = "368196891489";
-	private static HashSet<String> keywordSet = null;
+
     
     private Connection connection;
     
@@ -60,6 +61,7 @@ public class Q2MySQLServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) 
             throws ServletException, IOException {
+        HashSet<String> keywordSet = null;
     	String hashtag = request.getParameter("hashtag");
     	String N = request.getParameter("N");
     	String list_of_key_words = request.getParameter("list_of_key_words");
@@ -74,7 +76,7 @@ public class Q2MySQLServlet extends HttpServlet {
             //System.out.println(text);
         	if (text != null && !text.isEmpty()) {
         		try {
-        			String output = parse(text, Integer.parseInt(N));
+        			String output = parse(text, Integer.parseInt(N),keywordSet);
         			result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n" + output + "\n";
         		} catch (ParseException e) {
         			System.err.print("can`t be parsed");
@@ -87,12 +89,12 @@ public class Q2MySQLServlet extends HttpServlet {
     	
     	PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
-    	System.out.println(result.toString());
+    	//System.out.println(result.toString());
     	writer.write(result.toString());
         writer.close();
     }
     
-    private String parse(String input, Integer N) throws ParseException { //从选择出来的text中提取所有的word和freq配对
+    private String parse(String input, Integer N, HashSet<String> keywordSet) throws ParseException { //从选择出来的text中提取所有的word和freq配对
     	HashMap<String, Integer> map = new HashMap<>(); // userId, sum
     	JSONParser jsonParser = new JSONParser();
     	JSONArray array = (JSONArray)jsonParser.parse(input);
@@ -100,7 +102,7 @@ public class Q2MySQLServlet extends HttpServlet {
     	for (int i = 0; i < array.size(); i++) {
     		JSONObject jsonObj = (JSONObject) array.get(i);
     		JSONObject textObj = (JSONObject) jsonObj.get("text"); //{"text": "word":1 "word2":2, {"userid" : 234234}}
-    		int value = getSum(textObj);
+    		int value = getSum(textObj, keywordSet);
 
     		String useridObj = (String) jsonObj.get("userid");
     		map.put(useridObj, map.getOrDefault(useridObj, 0) + value);
@@ -133,7 +135,7 @@ public class Q2MySQLServlet extends HttpServlet {
     	return sb.toString();
     }
     
-    private int getSum(JSONObject jObject) { //计算和
+    private int getSum(JSONObject jObject, HashSet<String> keywordSet) { //计算和
 		int sum = 0;
 
 		for (Object key : jObject.keySet()) {
@@ -174,7 +176,7 @@ public class Q2MySQLServlet extends HttpServlet {
 
     
 
-    private static HashSet<String> getKeyWordList(String list) { // 从list里面得到所有需要找的word
+    private HashSet<String> getKeyWordList(String list) { // 从list里面得到所有需要找的word
     	HashSet<String> result = new HashSet<>();
     	for (String str : list.split(",")) {
     		result.add(str.toLowerCase());
