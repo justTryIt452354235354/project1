@@ -23,6 +23,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+
+
 /**
  * 
  * @author zack
@@ -30,12 +32,13 @@ import org.json.simple.parser.ParseException;
  */
 public class Q2MySQLServlet extends HttpServlet {
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_NAME = "q2db"; //TODO
+    private static final String DB_NAME = "query2db"; 
     private static final String URL = "jdbc:mysql://ccdb.c6nxguhfkaz7.us-east-1.rds.amazonaws.com/" + DB_NAME + "?useSSL=false";
-    private static final String DB_USER = System.getenv("db_user"); //TODO
-    private static final String DB_PWD = System.getenv("db_pwd"); //TODO
-    private static final String TEAM_ID = "";
-    private static final String TEAM_AWS_ACCOUNT_ID = "";    
+    private static final String DB_USER = "localhost"; 
+    private static final String DB_PWD = "husky2017"; 
+    private static final String TEAM_ID = "let's go husky";
+    private static final String TEAM_AWS_ACCOUNT_ID = "368196891489";
+    
     
     private static Connection connection;
     
@@ -67,12 +70,17 @@ public class Q2MySQLServlet extends HttpServlet {
        		result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n";
        	} else {
        		String column = queryFromMySQL(hashtag, N, list_of_key_words);
-        	try {
-    			String output = parse(column, Integer.parseInt(N));
-    			result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n" + output + "\n";
-    		} catch (ParseException e) {
-    			e.printStackTrace();
-    		}
+        	if (column != null) {
+        		try {
+        			String output = parse(column, Integer.parseInt(N));
+        			result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n" + output + "\n";
+        		} catch (ParseException e) {
+        			e.printStackTrace();
+        		}
+        	} else {
+        		result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n";
+        	}
+       		
        	}
     	
     	PrintWriter writer = new PrintWriter(
@@ -132,15 +140,17 @@ public class Q2MySQLServlet extends HttpServlet {
 		return sum;
     }
     
-    // TODO
     private String queryFromMySQL(String hashtag, String N, String list_of_key_words) throws ServletException, IOException {
-       	String result = ""; //TODO
-    	String sql = ""; //TODO
+       	
+    	String sql = "select text from query2table where hashtage = " + hashtag; 
     	PreparedStatement statement = null;
     	ResultSet resultSet = null;    	
     	try {
     		statement = connection.prepareStatement(sql);
-    		//TODO
+    		resultSet = statement.executeQuery();
+    		if (resultSet.next()) {
+    			return resultSet.getString(0);
+    		}
     	} catch (SQLException e) {
     		e.printStackTrace();
     	} finally {
@@ -151,7 +161,7 @@ public class Q2MySQLServlet extends HttpServlet {
 				e.printStackTrace();
 			}
         }
-    	return result;
+    	return null;
     }
 
     
