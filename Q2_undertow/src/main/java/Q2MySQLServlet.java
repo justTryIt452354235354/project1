@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mongodb.util.JSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,7 +40,7 @@ public class Q2MySQLServlet extends HttpServlet {
     private static final String TEAM_AWS_ACCOUNT_ID = "368196891489";
 	private static HashSet<String> keywordSet = null;
     
-    private static Connection connection;
+    private Connection connection;
     
     private void initializeConnection() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
@@ -94,12 +95,13 @@ public class Q2MySQLServlet extends HttpServlet {
     private String parse(String input, Integer N) throws ParseException { //从选择出来的text中提取所有的word和freq配对
     	HashMap<String, Integer> map = new HashMap<>(); // userId, sum
     	JSONParser jsonParser = new JSONParser();
-    	Object obj = jsonParser.parse(input);
-    	JSONArray array = (JSONArray) obj;
+    	JSONArray array = (JSONArray)jsonParser.parse(input);
+
     	for (int i = 0; i < array.size(); i++) {
     		JSONObject jsonObj = (JSONObject) array.get(i);
     		JSONObject textObj = (JSONObject) jsonObj.get("text"); //{"text": "word":1 "word2":2, {"userid" : 234234}}
     		int value = getSum(textObj);
+
     		String useridObj = (String) jsonObj.get("userid");
     		map.put(useridObj, map.getOrDefault(useridObj, 0) + value);
     	}
@@ -131,7 +133,7 @@ public class Q2MySQLServlet extends HttpServlet {
     	return sb.toString();
     }
     
-    private static int getSum(JSONObject jObject) { //计算和
+    private int getSum(JSONObject jObject) { //计算和
 		int sum = 0;
 
 		for (Object key : jObject.keySet()) {
@@ -153,18 +155,20 @@ public class Q2MySQLServlet extends HttpServlet {
     		resultSet = statement.executeQuery(sql);
     		if (resultSet == null) return null;
     		if (resultSet.next()) {
-    			return resultSet.getString(1);
+    			return resultSet.getString("text");
     		}
     	} catch (SQLException e) {
     		e.printStackTrace();
-    	} finally {
+        } finally {
         	try {
-				resultSet.close();
-				statement.close();
+				if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+               // if (connection != null) connection.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
         }
+
     	return null;
     }
 
