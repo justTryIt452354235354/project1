@@ -33,8 +33,8 @@ import org.json.simple.parser.ParseException;
 public class Q2MySQLServlet extends HttpServlet {
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_NAME = "query2db"; 
-    private static final String URL = "jdbc:mysql://ccdb.c6nxguhfkaz7.us-east-1.rds.amazonaws.com/" + DB_NAME + "?useSSL=false";
-    private static final String DB_USER = "localhost"; 
+    private static final String URL = "jdbc:mysql://localhost:3306/" + DB_NAME + "?useSSL=false";
+    private static final String DB_USER = "root"; 
     private static final String DB_PWD = "husky2017"; 
     private static final String TEAM_ID = "let's go husky";
     private static final String TEAM_AWS_ACCOUNT_ID = "368196891489";
@@ -64,7 +64,8 @@ public class Q2MySQLServlet extends HttpServlet {
     	String N = request.getParameter("N");
     	String list_of_key_words = request.getParameter("list_of_key_words");
     	keywordSet = getKeyWordList(list_of_key_words);
-    	
+	System.out.println("-------" + hashtag);        
+      	
     	String result = "";
     	if (hashtag == null) {
        		result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n";
@@ -142,14 +143,14 @@ public class Q2MySQLServlet extends HttpServlet {
     
     private String queryFromMySQL(String hashtag, String N, String list_of_key_words) throws ServletException, IOException {
        	
-    	String sql = "select text from query2table where hashtage = " + hashtag; 
-    	PreparedStatement statement = null;
+    	String sql = "select text from query2table where hashtage = '" + hashtag + "' AND BINARY(hashtage) = BINARY('" + hashtag + "')"; 
+    	Statement statement = null;
     	ResultSet resultSet = null;    	
     	try {
-    		statement = connection.prepareStatement(sql);
-    		resultSet = statement.executeQuery();
+    		statement = connection.createStatement();
+    		resultSet = statement.executeQuery(sql);
     		if (resultSet.next()) {
-    			return resultSet.getString(0);
+    			return resultSet.getString(1);
     		}
     	} catch (SQLException e) {
     		e.printStackTrace();
