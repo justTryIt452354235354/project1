@@ -1,5 +1,4 @@
-package cc.cmu.edu.Q1;
-
+import java.math.BigInteger;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,13 +31,13 @@ import org.json.simple.parser.ParseException;
  */
 public class Q2MySQLServlet extends HttpServlet {
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_NAME = "query2db"; 
+    private static final String DB_NAME = "q2";
     private static final String URL = "jdbc:mysql://localhost:3306/" + DB_NAME + "?useSSL=false";
-    private static final String DB_USER = "root"; 
+    private static final String DB_USER = "root";
     private static final String DB_PWD = "husky2017"; 
     private static final String TEAM_ID = "let's go husky";
     private static final String TEAM_AWS_ACCOUNT_ID = "368196891489";
-    
+	private static HashSet<String> keywordSet = null;
     
     private static Connection connection;
     
@@ -63,20 +62,21 @@ public class Q2MySQLServlet extends HttpServlet {
     	String hashtag = request.getParameter("hashtag");
     	String N = request.getParameter("N");
     	String list_of_key_words = request.getParameter("list_of_key_words");
-    	keywordSet = getKeyWordList(list_of_key_words);
-	System.out.println("-------" + hashtag);        
+    	keywordSet = getKeyWordList(list_of_key_words);//得到全部要求查找的keyword
+		//System.out.println("-------" + hashtag);
       	
     	String result = "";
-    	if (hashtag == null) {
+    	if (hashtag == null || hashtag.isEmpty()) {
        		result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n";
        	} else {
-       		String column = queryFromMySQL(hashtag, N, list_of_key_words);
-        	if (column != null) {
+       		String text = queryFromMySQL(hashtag);//由tag得到jsonarray
+            //System.out.println(text);
+        	if (text != null && !text.isEmpty()) {
         		try {
-        			String output = parse(column, Integer.parseInt(N));
+        			String output = parse(text, Integer.parseInt(N));
         			result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n" + output + "\n";
         		} catch (ParseException e) {
-        			e.printStackTrace();
+        			System.err.print("can`t be parsed");
         		}
         	} else {
         		result = TEAM_ID + "," + TEAM_AWS_ACCOUNT_ID + "\n";
@@ -86,50 +86,52 @@ public class Q2MySQLServlet extends HttpServlet {
     	
     	PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
+    	System.out.println(result.toString());
     	writer.write(result.toString());
         writer.close();
     }
     
-    private String parse(String input, Integer N) throws ParseException {
+    private String parse(String input, Integer N) throws ParseException { //从选择出来的text中提取所有的word和freq配对
     	HashMap<String, Integer> map = new HashMap<>(); // userId, sum
     	JSONParser jsonParser = new JSONParser();
     	Object obj = jsonParser.parse(input);
     	JSONArray array = (JSONArray) obj;
     	for (int i = 0; i < array.size(); i++) {
     		JSONObject jsonObj = (JSONObject) array.get(i);
-    		JSONObject textObj = (JSONObject) jsonObj.get("text");
+    		JSONObject textObj = (JSONObject) jsonObj.get("text"); //{"text": "word":1 "word2":2, {"userid" : 234234}}
     		int value = getSum(textObj);
     		String useridObj = (String) jsonObj.get("userid");
-    		map.put(useridObj, value);
+    		map.put(useridObj, map.getOrDefault(useridObj, 0) + value);
     	}
     	
     	// sort
     	Set<Entry<String, Integer>> set = map.entrySet();
     	ArrayList<Entry<String, Integer>> list = new ArrayList<>(set);
-    	list.sort(new Comparator<Entry<String, Integer>>() {
-			@Override
-			public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-				int tmp = o2.getValue().compareTo(o1.getValue());
-				if (tmp == 0) {
-					tmp = o1.getKey().compareTo(o2.getKey());
-				}
-				return tmp;
-			}		
-    	});
+    	list.sort((o1, o2) -> {
+            int tmp = o2.getValue().compareTo(o1.getValue());
+            if (tmp == 0) {
+                tmp = new BigInteger(o1.getKey()).compareTo(new BigInteger(o2.getKey()));
+            }
+            return tmp;
+        });
     	
     	StringBuilder sb = new StringBuilder();
     	int number = list.size() < N ? list.size() : N;
-    	for (int i = 0; i < number - 1; i++) {
+    	for (int i = 0; i < number; i++) {
 			String userId = list.get(i).getKey();
 			Integer sum = list.get(i).getValue();
-			sb.append(userId + ":" + sum + ",");
+			if (i == number - 1) {
+			    sb.append(userId + ":" + sum);
+            } else {
+                sb.append(userId + ":" + sum + ",");
+            }
 		}
-		sb.append(list.get(list.size() - 1).getKey() + ":" + list.get(list.size() - 1).getValue());
+		//sb.append(list.get(list.size() - 1).getKey() + ":" + list.get(list.size() - 1).getValue());
 		
     	return sb.toString();
     }
     
-    private static int getSum(JSONObject jObject) {
+    private static int getSum(JSONObject jObject) { //计算和
 		int sum = 0;
 
 		for (Object key : jObject.keySet()) {
@@ -141,14 +143,15 @@ public class Q2MySQLServlet extends HttpServlet {
 		return sum;
     }
     
-    private String queryFromMySQL(String hashtag, String N, String list_of_key_words) throws ServletException, IOException {
-       	
-    	String sql = "select text from query2table where hashtage = '" + hashtag + "' AND BINARY(hashtage) = BINARY('" + hashtag + "')"; 
+    private String queryFromMySQL(String hashtag) throws ServletException, IOException { // 从数据库中选出tag对应的所有text然后交给下一步处理
+
+    	String sql = "select text from q2table where hashtag = '" + hashtag + "' AND BINARY(hashtag) = BINARY('" + hashtag + "')";
     	Statement statement = null;
-    	ResultSet resultSet = null;    	
+    	ResultSet resultSet = null;
     	try {
     		statement = connection.createStatement();
     		resultSet = statement.executeQuery(sql);
+    		if (resultSet == null) return null;
     		if (resultSet.next()) {
     			return resultSet.getString(1);
     		}
@@ -166,8 +169,8 @@ public class Q2MySQLServlet extends HttpServlet {
     }
 
     
-    private static HashSet<String> keywordSet = null;
-    private static HashSet<String> getKeyWordList(String list) {
+
+    private static HashSet<String> getKeyWordList(String list) { // 从list里面得到所有需要找的word
     	HashSet<String> result = new HashSet<>();
     	for (String str : list.split(",")) {
     		result.add(str.toLowerCase());

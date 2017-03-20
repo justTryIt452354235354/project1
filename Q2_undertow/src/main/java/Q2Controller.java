@@ -1,5 +1,3 @@
-package cc.cmu.edu.Q1;
-
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
