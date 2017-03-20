@@ -84,7 +84,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>cc.cmu.edu.Q1.Q1Controller</mainClass>
+                    <mainClass>cc.cmu.edu.Q1.Q2Controller</mainClass>
                 </configuration>
             </plugin>
             <plugin>

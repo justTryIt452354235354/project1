@@ -27,7 +27,7 @@ public class Q2Controller {
                     .setContextPath(PATH)
                     .setDeploymentName("handler.war")
                     .addServlets(
-                            servlet("Q2MySQLServlet", Q1Servlet.class)
+                            servlet("Q2MySQLServlet", Q2MySQLServlet.class)
                             .addMapping("/")
                     );
 
