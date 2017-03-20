@@ -1,9 +1,9 @@
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import org.json.simple.JSONArray;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -121,6 +121,8 @@ public class Mapper {
 
                     String text = obj.get("text").toString();
 
+
+
                     HashMap<String, Integer> wordFreq = effectiveWord(text, stopwords);
                     lineResult.put("text", wordFreq);
 
@@ -155,8 +157,9 @@ public class Mapper {
                         if (tag.get("text") == null || tag.get("text").toString().isEmpty()) continue;
                         
                         String hashTag_text = tag.get("text").toString();
-                        lineResult.put("hashTag_text", hashTag_text);
-                        printWriter.print(lineResult.toString() + "\n");
+                        //lineResult.put("hashTag_text", hashTag_text);
+                        printWriter.append(hashTag_text + "\t");
+                        printWriter.append(lineResult.toString() + "\n");
                     }
                 } catch (ParseException e) {
                     continue; // cannot be parsed as a JSON object
@@ -171,13 +174,14 @@ public class Mapper {
 
 
     public static HashSet<String> readStopWords() {
-        String FILENAME = "stopwords.txt";
+//        String FILENAME = "stopwords.txt";
         HashSet<String> stopwords = new HashSet<String>();
 
         String line;
         try {
-            FileReader fileReader = new FileReader(FILENAME);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//            FileReader fileReader = new FileReader(FILENAME);
+            URL words = new URL("https://s3.amazonaws.com/cmucc-public/s17/teamproject/stopwords.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(words.openStream(), "utf-8"));
 
             while ((line = bufferedReader.readLine()) != null) {
                 stopwords.add(line.toLowerCase());

@@ -38,8 +38,8 @@ public class Reducer {
                 try {
 
                     JSONParser parser = new JSONParser();
-                    JSONObject lineResult = (JSONObject) parser.parse(line);
-                    tag = lineResult.get("hashTag_text").toString();
+                    JSONObject lineResult = (JSONObject) parser.parse(line.split("\t")[1]);
+                    tag = line.split("\t")[0];
                     Object tid = lineResult.get("tid");
 
 
